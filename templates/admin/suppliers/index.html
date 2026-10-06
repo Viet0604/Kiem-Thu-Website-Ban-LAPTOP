@@ -1,0 +1,70 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-building me-2"></i>Quản Lý Nhà Cung Cấp</h2>
+    <a href="{{ url_for('admin.create_supplier') }}" class="btn btn-gradient">
+        <i class="bi bi-plus-circle me-1"></i> Thêm nhà cung cấp
+    </a>
+</div>
+
+{% if not suppliers %}
+    <div class="empty-state bg-white rounded-4 shadow-sm">
+        <i class="bi bi-building"></i>
+        <h5>Chưa có nhà cung cấp nào</h5>
+        <p class="text-muted">Thêm nhà cung cấp để quản lý nguồn hàng.</p>
+    </div>
+{% else %}
+    <div class="admin-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên nhà cung cấp</th>
+                    <th>Liên hệ</th>
+                    <th>Điện thoại</th>
+                    <th>Email</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in suppliers %}
+                    <tr>
+                        <td class="fw-bold">{{ s.id }}</td>
+                        <td>
+                            <div class="fw-semibold">{{ s.name }}</div>
+                            {% if s.address %}
+                                <small class="text-muted">{{ s.address }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ s.contact_person or '—' }}</td>
+                        <td>{{ s.phone or '—' }}</td>
+                        <td><small>{{ s.email or '—' }}</small></td>
+                        <td>
+                            {% if s.is_active %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Hoạt động</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Ngưng</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{{ url_for('admin.edit_supplier', supplier_id=s.id) }}" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form action="{{ url_for('admin.toggle_supplier', supplier_id=s.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Ẩn/Hiện">
+                                        <i class="bi bi-toggle-{% if s.is_active %}on{% else %}off{% endif %}"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-muted mt-3"><small>Tổng: {{ suppliers|length }} nhà cung cấp</small></div>
+{% endif %}
+{% endblock %}

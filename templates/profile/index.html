@@ -1,0 +1,75 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">{{ user.fullname }}</h4>
+                    <p class="opacity-75 mb-0">{{ user.email }}</p>
+                </div>
+
+                <div class="p-4">
+                    <!-- Cập nhật thông tin -->
+                    <h5 class="fw-bold mb-3"><i class="bi bi-pencil-square text-primary me-2"></i>Cập nhật thông tin</h5>
+                    <form action="{{ url_for('profile.index') }}" method="POST">
+                        <input type="hidden" name="action" value="update_info">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Họ và tên</label>
+                                <input type="text" class="form-control" name="fullname"
+                                       value="{{ user.fullname }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="text" class="form-control" name="phone"
+                                       value="{{ user.phone or '' }}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Địa chỉ</label>
+                                <textarea class="form-control" name="address" rows="2">{{ user.address or '' }}</textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i> Lưu thay đổi
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <!-- Đổi mật khẩu -->
+                    <h5 class="fw-bold mb-3"><i class="bi bi-shield-lock text-primary me-2"></i>Đổi mật khẩu</h5>
+                    <form action="{{ url_for('profile.index') }}" method="POST">
+                        <input type="hidden" name="action" value="change_password">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Mật khẩu hiện tại</label>
+                                <input type="password" class="form-control" name="current_password" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mật khẩu mới</label>
+                                <input type="password" class="form-control" name="new_password" minlength="6" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Xác nhận mật khẩu mới</label>
+                                <input type="password" class="form-control" name="confirm_password" required>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-key me-1"></i> Đổi mật khẩu
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

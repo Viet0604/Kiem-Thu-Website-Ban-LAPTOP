@@ -1,0 +1,49 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="bi bi-person-plus" style="font-size:2.5rem;"></i>
+            <h3 class="mt-2">Đăng Ký Tài Khoản</h3>
+            <p>Tạo tài khoản để mua sắm tại LaptopStore</p>
+        </div>
+        <div class="auth-body">
+            <form action="{{ url_for('auth.register') }}" method="POST" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="fullname" class="form-label">Họ và tên <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="fullname" name="fullname"
+                           placeholder="Nguyễn Văn A" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" id="email" name="email"
+                           placeholder="example@email.com" required>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Số điện thoại</label>
+                    <input type="text" class="form-control" id="phone" name="phone"
+                           placeholder="0912345678">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="password" name="password"
+                           placeholder="Ít nhất 6 ký tự" minlength="6" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password_confirm" class="form-label">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" id="password_confirm" name="password_confirm"
+                           placeholder="Nhập lại mật khẩu" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-2">
+                    <i class="bi bi-person-plus me-1"></i> Đăng ký
+                </button>
+            </form>
+            <div class="text-center mt-3">
+                <span class="text-muted">Đã có tài khoản? </span>
+                <a href="{{ url_for('auth.login_form') }}" class="fw-bold">Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

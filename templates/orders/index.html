@@ -1,0 +1,54 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="breadcrumb-custom">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('products.home') }}">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Đơn hàng của tôi</li>
+            </ol>
+        </nav>
+    </div>
+
+    <h2 class="fw-bold mb-4"><i class="bi bi-bag-check text-primary me-2"></i>Đơn Hàng Của Tôi</h2>
+
+    {% if not orders %}
+        <div class="empty-state bg-white rounded-3 shadow-sm">
+            <i class="bi bi-bag-x"></i>
+            <h5>Chưa có đơn hàng</h5>
+            <p class="text-muted">Bạn chưa đặt đơn hàng nào.</p>
+            <a href="{{ url_for('products.index') }}" class="btn btn-primary">
+                <i class="bi bi-grid me-1"></i> Mua sắm ngay
+            </a>
+        </div>
+    {% else %}
+        {% for order in orders %}
+            {% set status_info = order.status | order_status %}
+            <div class="order-card">
+                <div class="order-header">
+                    <div>
+                        <strong>Đơn hàng #{{ order.id }}</strong>
+                        <span class="text-muted ms-2">{{ order.created_at }}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge {{ status_info[1] }}">{{ status_info[0] }}</span>
+                        <a href="{{ url_for('orders.detail', order_id=order.id) }}" class="btn btn-outline-primary btn-sm">
+                            Chi tiết <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="order-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted">Thanh toán: </span>
+                            <span>{{ order.payment_method | payment_label }}</span>
+                        </div>
+                        <div class="fw-bold text-danger fs-5">{{ order.total_amount | format_price }}</div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

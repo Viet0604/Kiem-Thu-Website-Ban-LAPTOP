@@ -1,0 +1,267 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-grid-1x2-fill me-2"></i>Dashboard</h2>
+    <span class="text-muted">Xin chào, <strong>{{ current_user.fullname }}</strong>!</span>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card stat-primary">
+            <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:var(--primary);">
+                <i class="bi bi-receipt-cutoff"></i>
+            </div>
+            <div class="stat-value">{{ stats.total_orders }}</div>
+            <div class="stat-label">Tổng đơn hàng</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card stat-warning">
+            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:var(--warning);">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div class="stat-value">{{ stats.pending_orders }}</div>
+            <div class="stat-label">Chờ xử lý</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card stat-success">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:var(--success);">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="stat-value" style="font-size:1.2rem;">{{ stats.total_revenue | format_price }}</div>
+            <div class="stat-label">Doanh thu</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card stat-info">
+            <div class="stat-icon" style="background:rgba(6,182,212,0.1);color:var(--info);">
+                <i class="bi bi-laptop"></i>
+            </div>
+            <div class="stat-value">{{ stats.total_products }}</div>
+            <div class="stat-label">Sản phẩm</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card stat-accent">
+            <div class="stat-icon" style="background:rgba(244,63,94,0.1);color:var(--accent);">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-value">{{ stats.total_users }}</div>
+            <div class="stat-label">Khách hàng</div>
+        </div>
+    </div>
+    <div class="col-xl-2 col-md-4 col-6">
+        <div class="stat-card stat-primary">
+            <div class="stat-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6;">
+                <i class="bi bi-boxes"></i>
+            </div>
+            <div class="stat-value">{{ stats.total_stock }}</div>
+            <div class="stat-label">Tổng tồn kho</div>
+        </div>
+    </div>
+</div>
+
+<!-- Low stock alert -->
+{% if low_stock %}
+    <div class="low-stock-alert mb-4">
+        <h6 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Sản phẩm sắp hết hàng</h6>
+        <div class="d-flex flex-wrap gap-2">
+            {% for p in low_stock %}
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2">
+                    {{ p.name }} — <strong>{{ p.stock }}</strong> sp
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Biểu đồ doanh thu -->
+    <div class="col-lg-8">
+        <div class="bg-white rounded-4 p-4 shadow-sm">
+            <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Doanh Thu Theo Tháng</h5>
+            <div style="position: relative; height: 320px; width: 100%;">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top sản phẩm bán chạy -->
+    <div class="col-lg-4">
+        <div class="bg-white rounded-4 p-4 shadow-sm">
+            <h5 class="fw-bold mb-3"><i class="bi bi-trophy-fill text-warning me-2"></i>Bán Chạy Nhất</h5>
+            {% if not top_products %}
+                <p class="text-muted text-center py-3">Chưa có dữ liệu</p>
+            {% else %}
+                <div style="position: relative; height: 220px; width: 100%; margin-bottom: 1.5rem;">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+                {% for tp in top_products %}
+                    {% set i = loop.index0 %}
+                    <div class="d-flex align-items-center gap-3 mb-3 pb-2 {% if not loop.last %}border-bottom{% endif %}">
+                        <span class="badge bg-{% if i == 0 %}warning text-dark{% elif i == 1 %}secondary{% else %}light text-dark border{% endif %} rounded-circle d-flex align-items-center justify-content-center" style="width:32px;height:32px;font-size:0.85rem;">
+                            {{ i + 1 }}
+                        </span>
+                        <div class="flex-grow-1">
+                            <small class="fw-semibold d-block">{{ tp.name }}</small>
+                            <small class="text-muted">Đã bán: <strong>{{ tp.total_sold }}</strong></small>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Đơn hàng gần đây -->
+<div class="mt-4">
+    <div class="bg-white rounded-4 shadow-sm overflow-hidden">
+        <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
+            <h5 class="fw-bold mb-0"><i class="bi bi-clock-history text-primary me-2"></i>Đơn Hàng Gần Đây</h5>
+            <a href="{{ url_for('admin.orders') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Xem tất cả</a>
+        </div>
+        <table class="table mb-0">
+            <thead>
+                <tr style="background:var(--gray-50);">
+                    <th style="padding:0.85rem 1.1rem;">Mã ĐH</th>
+                    <th>Khách hàng</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày đặt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ro in recent_orders %}
+                    {% set st = ro.status | order_status %}
+                    <tr>
+                        <td style="padding:0.85rem 1.1rem;"><a href="{{ url_for('admin.order_detail', order_id=ro.id) }}" class="fw-bold text-primary">#{{ ro.id }}</a></td>
+                        <td>{{ ro.user_fullname }}</td>
+                        <td class="fw-bold">{{ ro.total_amount | format_price }}</td>
+                        <td><span class="badge {{ st[1] }}">{{ st[0] }}</span></td>
+                        <td class="text-muted"><small>{{ ro.created_at }}</small></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const revenueData = {{ revenue_by_month | tojson | safe }};
+
+if (revenueData && revenueData.length > 0) {
+    const labels = revenueData.map(r => r.month);
+    const data = revenueData.map(r => parseFloat(r.revenue));
+
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
+    gradient.addColorStop(1, 'rgba(139, 92, 246, 0.3)');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Doanh thu (VNĐ)',
+                data: data,
+                backgroundColor: gradient,
+                borderColor: 'rgba(99, 102, 241, 1)',
+                borderWidth: 1,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleFont: { family: 'Outfit' },
+                    bodyFont: { family: 'Outfit' },
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(ctx) {
+                            return new Intl.NumberFormat('vi-VN').format(ctx.raw) + ' ₫';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.04)' },
+                    ticks: {
+                        font: { family: 'Outfit' },
+                        callback: function(value) {
+                            if (value >= 1000000) {
+                                return (value / 1000000).toFixed(1) + 'M';
+                            } else if (value >= 1000) {
+                                return (value / 1000).toFixed(1) + 'K';
+                            }
+                            return value;
+                        }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'Outfit' } }
+                }
+            }
+        }
+    });
+} else {
+    // Show empty state
+    const canvasContainer = document.getElementById('revenueChart').parentElement;
+    canvasContainer.innerHTML = '<div class="text-center py-5 text-muted"><i class="bi bi-bar-chart text-secondary mb-3" style="font-size:3rem; opacity:0.5;"></i><p>Chưa có dữ liệu doanh thu (cần có đơn hàng ở trạng thái Đã giao)</p></div>';
+}
+
+const topProductsData = {{ top_products | tojson | safe }};
+if (topProductsData && topProductsData.length > 0) {
+    const tpLabels = topProductsData.map(tp => tp.name.length > 20 ? tp.name.substring(0, 20) + '...' : tp.name);
+    const tpData = topProductsData.map(tp => tp.total_sold);
+    const tpCtx = document.getElementById('topProductsChart').getContext('2d');
+    
+    new Chart(tpCtx, {
+        type: 'doughnut',
+        data: {
+            labels: tpLabels,
+            datasets: [{
+                data: tpData,
+                backgroundColor: [
+                    '#6366f1',
+                    '#8b5cf6',
+                    '#ec4899',
+                    '#10b981',
+                    '#f59e0b'
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        font: { family: 'Outfit', size: 11 },
+                        usePointStyle: true,
+                        boxWidth: 8
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-custom">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('products.home') }}">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Sản phẩm</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sidebar Filter -->
+        <div class="col-lg-3">
+            <div class="filter-card">
+                <h5><i class="bi bi-funnel"></i> Bộ lọc</h5>
+                <form action="{{ url_for('products.index') }}" method="GET">
+                    <!-- Tìm kiếm -->
+                    <div class="mb-3">
+                        <label class="form-label">Tìm kiếm</label>
+                        <div class="search-bar">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" class="form-control" name="keyword" id="searchInput"
+                                   value="{{ filters.keyword }}" placeholder="Nhập tên laptop...">
+                        </div>
+                    </div>
+
+                    <!-- Hãng sản xuất -->
+                    <div class="mb-3">
+                        <label class="form-label">Hãng sản xuất</label>
+                        <select name="brand" class="form-select">
+                            <option value="">Tất cả hãng</option>
+                            {% for brand in brands %}
+                                <option value="{{ brand }}"
+                                    {% if filters.brand == brand %}selected{% endif %}>
+                                    {{ brand }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- RAM -->
+                    <div class="mb-3">
+                        <label class="form-label">RAM</label>
+                        <select name="ram" class="form-select">
+                            <option value="">Tất cả</option>
+                            <option value="8GB" {% if filters.ram == '8GB' %}selected{% endif %}>8GB</option>
+                            <option value="16GB" {% if filters.ram == '16GB' %}selected{% endif %}>16GB</option>
+                            <option value="32GB" {% if filters.ram == '32GB' %}selected{% endif %}>32GB</option>
+                        </select>
+                    </div>
+
+                    <!-- CPU -->
+                    <div class="mb-3">
+                        <label class="form-label">CPU</label>
+                        <select name="cpu" class="form-select">
+                            <option value="">Tất cả</option>
+                            <option value="Intel Core i5" {% if filters.cpu == 'Intel Core i5' %}selected{% endif %}>Intel Core i5</option>
+                            <option value="Intel Core i7" {% if filters.cpu == 'Intel Core i7' %}selected{% endif %}>Intel Core i7</option>
+                            <option value="Intel Core i9" {% if filters.cpu == 'Intel Core i9' %}selected{% endif %}>Intel Core i9</option>
+                            <option value="AMD Ryzen 5" {% if filters.cpu == 'AMD Ryzen 5' %}selected{% endif %}>AMD Ryzen 5</option>
+                            <option value="AMD Ryzen 7" {% if filters.cpu == 'AMD Ryzen 7' %}selected{% endif %}>AMD Ryzen 7</option>
+                            <option value="Apple M" {% if filters.cpu == 'Apple M' %}selected{% endif %}>Apple M-series</option>
+                        </select>
+                    </div>
+
+                    <!-- Khoảng giá -->
+                    <div class="mb-3">
+                        <label class="form-label">Giá từ</label>
+                        <select name="price_min" class="form-select">
+                            <option value="">Không giới hạn</option>
+                            <option value="10000000" {% if filters.price_min == '10000000' %}selected{% endif %}>10 triệu</option>
+                            <option value="15000000" {% if filters.price_min == '15000000' %}selected{% endif %}>15 triệu</option>
+                            <option value="20000000" {% if filters.price_min == '20000000' %}selected{% endif %}>20 triệu</option>
+                            <option value="30000000" {% if filters.price_min == '30000000' %}selected{% endif %}>30 triệu</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Giá đến</label>
+                        <select name="price_max" class="form-select">
+                            <option value="">Không giới hạn</option>
+                            <option value="15000000" {% if filters.price_max == '15000000' %}selected{% endif %}>15 triệu</option>
+                            <option value="20000000" {% if filters.price_max == '20000000' %}selected{% endif %}>20 triệu</option>
+                            <option value="30000000" {% if filters.price_max == '30000000' %}selected{% endif %}>30 triệu</option>
+                            <option value="50000000" {% if filters.price_max == '50000000' %}selected{% endif %}>50 triệu</option>
+                        </select>
+                    </div>
+
+                    <!-- Sắp xếp -->
+                    <div class="mb-3">
+                        <label class="form-label">Sắp xếp</label>
+                        <select name="sort" class="form-select">
+                            <option value="newest" {% if filters.sort == 'newest' %}selected{% endif %}>Mới nhất</option>
+                            <option value="price_asc" {% if filters.sort == 'price_asc' %}selected{% endif %}>Giá thấp → cao</option>
+                            <option value="price_desc" {% if filters.sort == 'price_desc' %}selected{% endif %}>Giá cao → thấp</option>
+                            <option value="name_asc" {% if filters.sort == 'name_asc' %}selected{% endif %}>Tên A → Z</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search me-1"></i> Lọc sản phẩm
+                    </button>
+                    <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary w-100 mt-2">
+                        <i class="bi bi-x-circle me-1"></i> Xóa bộ lọc
+                    </a>
+                </form>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="text-muted mb-0">Tìm thấy <strong>{{ total }}</strong> sản phẩm</p>
+            </div>
+
+            {% if not products %}
+                <div class="empty-state">
+                    <i class="bi bi-search"></i>
+                    <h5>Không tìm thấy sản phẩm</h5>
+                    <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+                    <a href="{{ url_for('products.index') }}" class="btn btn-primary">Xem tất cả sản phẩm</a>
+                </div>
+            {% else %}
+                <div class="row g-3">
+                    {% for product in products %}
+                        <div class="col-md-4 col-sm-6">
+                            <div class="product-card">
+                                <div class="card-img-wrapper">
+                                    <span class="brand-badge">{{ product.brand }}</span>
+                                    {% if product.stock == 0 %}
+                                        <span class="stock-badge out-of-stock">Hết hàng</span>
+                                    {% elif product.stock <= 5 %}
+                                        <span class="stock-badge low-stock">Còn {{ product.stock }}</span>
+                                    {% else %}
+                                        <span class="stock-badge in-stock">Còn {{ product.stock }}</span>
+                                    {% endif %}
+                                    {% if product.image %}
+                                        <img src="{{ url_for('static', filename='images/laptops/' + product.image) }}" alt="{{ product.name }}">
+                                    {% else %}
+                                        <div class="product-placeholder"><i class="bi bi-laptop"></i></div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="{{ url_for('products.detail', product_id=product.id) }}">{{ product.name }}</a>
+                                    </h5>
+                                    <div class="specs">
+                                        <div><i class="bi bi-cpu"></i> {{ product.cpu }}</div>
+                                        <div><i class="bi bi-memory"></i> {{ product.ram }} · {{ product.storage }}</div>
+                                    </div>
+                                    <div class="card-footer-custom">
+                                        <span class="price">{{ product.price | format_price }}</span>
+                                        <form action="{{ url_for('cart.add') }}" method="POST" style="display:inline;">
+                                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-add-cart" title="Thêm vào giỏ"
+                                                    {% if product.stock < 1 %}disabled{% endif %}>
+                                                <i class="bi bi-cart-plus"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Phân trang -->
+                {% if total_pages > 1 %}
+                    <nav class="mt-4 d-flex justify-content-center">
+                        <ul class="pagination">
+                            {% for i in range(1, total_pages + 1) %}
+                                <li class="page-item {% if i == current_page %}active{% endif %}">
+                                    <a class="page-link" href="{{ url_for('products.index', page=i, **filters) }}">{{ i }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

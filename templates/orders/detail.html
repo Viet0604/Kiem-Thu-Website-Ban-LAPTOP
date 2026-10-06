@@ -1,0 +1,126 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+{% set status_info = order.status | order_status %}
+<div class="container py-4">
+    <div class="breadcrumb-custom">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('products.home') }}">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('orders.index') }}">Đơn hàng</a></li>
+                <li class="breadcrumb-item active">Đơn hàng #{{ order.id }}</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Thông tin đơn hàng -->
+            <div class="bg-white rounded-3 p-4 shadow-sm mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="fw-bold mb-0">Đơn hàng #{{ order.id }}</h4>
+                    <span class="badge {{ status_info[1] }} fs-6">{{ status_info[0] }}</span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2"><i class="bi bi-person me-1"></i>Người nhận</h6>
+                        <p class="mb-1 fw-semibold">{{ order.receiver_name }}</p>
+                        <p class="mb-1"><i class="bi bi-telephone me-1"></i> {{ order.receiver_phone }}</p>
+                        <p class="mb-0"><i class="bi bi-geo-alt me-1"></i> {{ order.receiver_address }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted mb-2"><i class="bi bi-info-circle me-1"></i>Thông tin</h6>
+                        <p class="mb-1">Ngày đặt: <strong>{{ order.created_at }}</strong></p>
+                        <p class="mb-1">Thanh toán: <strong>{{ order.payment_method | payment_label }}</strong></p>
+                        {% if order.note %}
+                            <p class="mb-0">Ghi chú: <em>{{ order.note }}</em></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chi tiết sản phẩm -->
+            <div class="bg-white rounded-3 shadow-sm overflow-hidden">
+                <table class="table mb-0">
+                    <thead>
+                        <tr style="background: var(--gray-100);">
+                            <th>Sản phẩm</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-end">Đơn giá</th>
+                            <th class="text-end">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order_details %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if item.image %}
+                                            <img src="{{ url_for('static', filename='images/laptops/' + item.image) }}"
+                                                 style="width:50px;height:40px;object-fit:contain;" alt="" class="bg-light rounded">
+                                        {% endif %}
+                                        <span class="fw-semibold">{{ item.product_name }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">{{ item.price | format_price }}</td>
+                                <td class="text-end fw-bold">{{ (item.price|int * item.quantity|int) | format_price }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold fs-5">Tổng cộng:</td>
+                            <td class="text-end fw-bold text-danger fs-5">{{ order.total_amount | format_price }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Trạng thái đơn hàng -->
+        <div class="col-lg-4">
+            <div class="bg-white rounded-3 p-4 shadow-sm">
+                <h5 class="fw-bold mb-3"><i class="bi bi-clock-history text-primary me-2"></i>Trạng thái đơn hàng</h5>
+                {% set steps = [
+                    ('pending', 'Chờ xử lý'), 
+                    ('processing', 'Đang xử lý'), 
+                    ('shipping', 'Đang giao hàng'), 
+                    ('delivered', 'Đã giao thành công')
+                ] %}
+                {% set statuses_order = ['pending', 'processing', 'shipping', 'delivered'] %}
+                {% set current_index = statuses_order.index(order.status) if order.status in statuses_order else -1 %}
+                
+                {% if order.status == 'cancelled' %}
+                    <div class="text-center py-3">
+                        <i class="bi bi-x-circle text-danger" style="font-size:3rem;"></i>
+                        <p class="text-danger fw-bold mt-2">Đơn hàng đã bị hủy</p>
+                    </div>
+                {% else %}
+                    {% for key, label in steps %}
+                        {% set step_index = loop.index0 %}
+                        {% set is_done = step_index <= current_index %}
+                        {% set is_current = step_index == current_index %}
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="flex-shrink-0">
+                                <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;
+                                    {% if is_done %}background:var(--primary);color:white;{% else %}background:var(--gray-200);color:var(--gray-400);{% endif %}">
+                                    {% if is_done %}<i class="bi bi-check"></i>{% else %}{{ step_index + 1 }}{% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <p class="mb-0 {% if is_current %}fw-bold text-primary{% elif is_done %}fw-semibold{% else %}text-muted{% endif %}">{{ label }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <a href="{{ url_for('orders.index') }}" class="btn btn-outline-primary w-100 mt-3">
+                <i class="bi bi-arrow-left me-1"></i> Quay lại đơn hàng
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

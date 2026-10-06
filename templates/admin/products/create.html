@@ -1,0 +1,92 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-plus-circle me-2"></i>Thêm Sản Phẩm Mới</h2>
+    <a href="{{ url_for('admin.products') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại
+    </a>
+</div>
+
+<div class="bg-white rounded-3 p-4 shadow-sm">
+    <form action="{{ url_for('admin.create_product') }}" method="POST" enctype="multipart/form-data">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label fw-semibold">Tên sản phẩm <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="name" required placeholder="VD: ASUS ROG Strix G16 2024">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Hãng sản xuất <span class="text-danger">*</span></label>
+                <select name="brand" class="form-select" required>
+                    <option value="">-- Chọn hãng --</option>
+                    <option value="ASUS">ASUS</option>
+                    <option value="Dell">Dell</option>
+                    <option value="HP">HP</option>
+                    <option value="Lenovo">Lenovo</option>
+                    <option value="Acer">Acer</option>
+                    <option value="MSI">MSI</option>
+                    <option value="Apple">Apple</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">CPU <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="cpu" required placeholder="VD: Intel Core i7-13700H">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">RAM <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="ram" required placeholder="VD: 16GB DDR5">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Ổ cứng <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="storage" required placeholder="VD: 512GB SSD NVMe">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Màn hình <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="screen_size" required placeholder="VD: 15.6 inch FHD IPS">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Card đồ họa</label>
+                <input type="text" class="form-control" name="gpu" placeholder="VD: NVIDIA RTX 4060 8GB">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Ảnh sản phẩm</label>
+                <input type="file" class="form-control" name="image" id="productImage" accept="image/*">
+                <img id="imagePreview" src="" alt="" class="mt-2 rounded" style="display:none;max-height:150px;">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Giá bán (VNĐ) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" name="price" required min="0" placeholder="VD: 25990000">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Số lượng tồn kho</label>
+                <input type="number" class="form-control" name="stock" min="0" value="0">
+            </div>
+            <div class="col-12">
+                <label class="form-label fw-semibold">Mô tả</label>
+                <textarea class="form-control" name="description" rows="4" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-check-circle me-1"></i> Thêm sản phẩm
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script>
+document.getElementById('productImage').addEventListener('change', function(e) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const preview = document.getElementById('imagePreview');
+        preview.src = event.target.result;
+        preview.style.display = 'block';
+    }
+    if (e.target.files[0]) {
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+</script>
+{% endblock %}

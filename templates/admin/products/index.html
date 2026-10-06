@@ -1,0 +1,86 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-laptop me-2"></i>Quản Lý Sản Phẩm</h2>
+    <a href="{{ url_for('admin.create_product') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Thêm sản phẩm
+    </a>
+</div>
+
+<div class="admin-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Hãng</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td class="fw-bold">{{ product.id }}</td>
+                    <td>
+                        {% if product.image %}
+                            <img src="{{ url_for('static', filename='images/laptops/' + product.image) }}" class="product-thumb" alt="">
+                        {% else %}
+                            <div class="product-thumb d-flex align-items-center justify-content-center">
+                                <i class="bi bi-image text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="fw-semibold">{{ product.name }}</div>
+                        <small class="text-muted">{{ product.cpu }} · {{ product.ram }}</small>
+                    </td>
+                    <td><span class="badge bg-light text-dark border">{{ product.brand }}</span></td>
+                    <td class="fw-bold text-danger">{{ product.price | format_price }}</td>
+                    <td>
+                        {% if product.stock == 0 %}
+                            <span class="badge bg-danger">Hết hàng</span>
+                        {% elif product.stock <= 5 %}
+                            <span class="text-warning fw-bold"><i class="bi bi-exclamation-circle me-1"></i>{{ product.stock }}</span>
+                        {% else %}
+                            <span class="text-success fw-bold">{{ product.stock }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if product.is_active %}
+                            <span class="badge bg-success">Đang bán</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Ẩn</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ url_for('admin.toggle_product', product_id=product.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-outline-warning" title="Ẩn/Hiện">
+                                    <i class="bi bi-eye{% if product.is_active %}-slash{% endif %}"></i>
+                                </button>
+                            </form>
+                            <form action="{{ url_for('admin.delete_product', product_id=product.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Xóa sản phẩm \'{{ product.name }}\'? Hành động này không thể hoàn tác.');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="text-muted mt-3">
+    <small>Tổng: {{ products|length }} sản phẩm</small>
+</div>
+{% endblock %}

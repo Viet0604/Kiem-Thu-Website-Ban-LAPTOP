@@ -1,0 +1,65 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-clock-history me-2"></i>Lịch Sử Nhập/Xuất Kho</h2>
+    <a href="{{ url_for('admin.inventory') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i> Quay lại kho</a>
+</div>
+
+{% if not logs %}
+    <div class="empty-state bg-white rounded-4 shadow-sm">
+        <i class="bi bi-clock-history"></i>
+        <h5>Chưa có lịch sử</h5>
+        <p class="text-muted">Lịch sử nhập xuất kho sẽ hiển thị ở đây.</p>
+    </div>
+{% else %}
+    <div class="admin-table">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Thời gian</th>
+                    <th>Sản phẩm</th>
+                    <th>Loại</th>
+                    <th class="text-center">Số lượng</th>
+                    <th>Nhà cung cấp</th>
+                    <th>Người thực hiện</th>
+                    <th>Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                    <tr>
+                        <td class="text-muted"><small>{{ log.created_at }}</small></td>
+                        <td>
+                            <span class="fw-semibold">{{ log.product_name }}</span>
+                            <br><small class="text-muted">{{ log.brand }}</small>
+                        </td>
+                        <td>
+                            {% if log.type == 'import' %}
+                                <span class="badge bg-success"><i class="bi bi-arrow-down-circle me-1"></i>Nhập kho</span>
+                            {% elif log.type == 'export' %}
+                                <span class="badge bg-danger"><i class="bi bi-arrow-up-circle me-1"></i>Xuất kho</span>
+                            {% else %}
+                                <span class="badge bg-info"><i class="bi bi-arrow-repeat me-1"></i>Điều chỉnh</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center fw-bold">
+                            {% if log.type == 'import' %}
+                                <span class="text-success">+{{ log.quantity }}</span>
+                            {% elif log.type == 'export' %}
+                                <span class="text-danger">-{{ log.quantity }}</span>
+                            {% else %}
+                                <span class="text-info">{{ log.quantity }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ log.supplier_name or '—' }}</td>
+                        <td>{{ log.created_by_name }}</td>
+                        <td><small class="text-muted">{{ log.note or '—' }}</small></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-muted mt-3"><small>Hiển thị {{ logs|length }} bản ghi gần nhất</small></div>
+{% endif %}
+{% endblock %}

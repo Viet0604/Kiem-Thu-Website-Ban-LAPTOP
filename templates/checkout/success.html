@@ -1,0 +1,54 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div class="success-animation">
+                <div class="success-icon">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+            </div>
+            <h2 class="fw-bold mb-2">Đặt Hàng Thành Công!</h2>
+            <p class="text-muted mb-4">Cảm ơn bạn đã mua sắm tại LaptopStore. Đơn hàng của bạn đang được xử lý.</p>
+
+            {% if order %}
+                <div class="bg-white rounded-3 p-4 shadow-sm text-start mb-4">
+                    <h5 class="fw-bold mb-3">Thông tin đơn hàng #{{ order.id }}</h5>
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <td class="text-muted">Người nhận:</td>
+                            <td class="fw-semibold">{{ order.receiver_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Điện thoại:</td>
+                            <td>{{ order.receiver_phone }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Địa chỉ:</td>
+                            <td>{{ order.receiver_address }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Thanh toán:</td>
+                            <td>{{ order.payment_method | payment_label }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Tổng tiền:</td>
+                            <td class="fw-bold text-danger fs-5">{{ order.total_amount | format_price }}</td>
+                        </tr>
+                    </table>
+                </div>
+            {% endif %}
+
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{{ url_for('orders.index') }}" class="btn btn-primary px-4">
+                    <i class="bi bi-bag-check me-1"></i> Xem đơn hàng
+                </a>
+                <a href="{{ url_for('products.index') }}" class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-grid me-1"></i> Tiếp tục mua sắm
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

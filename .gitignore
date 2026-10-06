@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+# Pytest / Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+report.xml
+# Excel DEMO (chi de minh hoa, khong nop)
+*_DEMO_*.xlsx
+# Word lock files
+~$*.docx
+~$*.xlsx
+# Node (chi can khi build Word; co the cai lai bang npm install)
+# node_modules/  <- giu lai theo lua chon "Don vua"; muon nhe nua thi bo comment dong nay
+# OS
+Thumbs.db
+.DS_Store

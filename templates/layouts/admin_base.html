@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - {{ page_title }} | LaptopStore</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.2">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="admin-wrapper">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="admin-sidebar d-flex flex-column">
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <i class="bi bi-laptop"></i>
+            <h5>LaptopStore</h5>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex-grow-1 py-2">
+            <div class="nav-section">
+                <div class="nav-section-title">Tổng quan</div>
+                <a href="{{ url_for('admin.dashboard') }}" 
+                   class="sidebar-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                    <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Quản lý</div>
+                <a href="{{ url_for('admin.products') }}"
+                   class="sidebar-link {% if 'product' in (request.endpoint or '') %}active{% endif %}">
+                    <i class="bi bi-laptop"></i> Sản phẩm
+                </a>
+                <a href="{{ url_for('admin.orders') }}"
+                   class="sidebar-link {% if 'order' in (request.endpoint or '') %}active{% endif %}">
+                    <i class="bi bi-receipt-cutoff"></i> Đơn hàng
+                </a>
+                <a href="{{ url_for('admin.users') }}"
+                   class="sidebar-link {% if 'user' in (request.endpoint or '') %}active{% endif %}">
+                    <i class="bi bi-people-fill"></i> Tài khoản
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Kho & Cung ứng</div>
+                <a href="{{ url_for('admin.inventory') }}"
+                   class="sidebar-link {% if 'inventory' in (request.endpoint or '') %}active{% endif %}">
+                    <i class="bi bi-box-seam-fill"></i> Quản lý kho
+                </a>
+                <a href="{{ url_for('admin.suppliers') }}"
+                   class="sidebar-link {% if 'supplier' in (request.endpoint or '') %}active{% endif %}">
+                    <i class="bi bi-building"></i> Nhà cung cấp
+                </a>
+            </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="sidebar-user">
+            <div class="sidebar-user-avatar">
+                {{ current_user.fullname[0] | upper if current_user else 'A' }}
+            </div>
+            <div class="flex-grow-1">
+                <div class="text-white fw-semibold" style="font-size:0.88rem;">{{ current_user.fullname }}</div>
+                <small style="color:rgba(255,255,255,0.5);font-size:0.75rem;">Administrator</small>
+            </div>
+            <a href="{{ url_for('auth.logout') }}" class="text-white opacity-50" title="Đăng xuất" style="font-size:1.1rem;">
+                <i class="bi bi-box-arrow-right"></i>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="admin-content">
+        <!-- Topbar -->
+        <div class="admin-topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-secondary d-lg-none" id="sidebarToggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0" style="font-size:0.88rem;">
+                        <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}">Admin</a></li>
+                        <li class="breadcrumb-item active">{{ page_title }}</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <a href="{{ url_for('products.home') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    <i class="bi bi-globe me-1"></i> Xem trang khách
+                </a>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        <div class="admin-main">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

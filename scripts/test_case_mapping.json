@@ -1,0 +1,130 @@
+{
+  "_comment": "Map Test Case ID (cot A cua Excel) -> danh sach pytest nodeid. Nhieu test co the quy ve 1 TC ID. Quy tac: co 1 test fail => Fail; tat ca pass => Pass; tat ca skip => N/A. TC ID khong co trong file nay giu nguyen 'Chua chay'.",
+  "UT-UTIL-01": [
+    "tests/unit/test_utils.py::test_format_price_formats_integer_with_vietnamese_separators"
+  ],
+  "UT-UTIL-02": [
+    "tests/unit/test_utils.py::test_format_price_returns_zero_for_none",
+    "tests/unit/test_utils.py::test_format_price_returns_zero_for_invalid_value"
+  ],
+  "UT-UTIL-03": [
+    "tests/unit/test_utils.py::test_safe_int_returns_default_for_invalid_input"
+  ],
+  "UT-UTIL-04": [
+    "tests/unit/test_utils.py::test_order_status_label_returns_text_and_css_class"
+  ],
+  "UT-UTIL-05": [
+    "tests/unit/test_utils.py::test_payment_method_label_returns_localized_text"
+  ],
+  "UT-AUTH-01": [
+    "tests/unit/test_utils.py::test_login_required_redirects_anonymous_user"
+  ],
+  "UT-AUTH-02": [
+    "tests/unit/test_utils.py::test_login_required_calls_wrapped_function_for_authenticated_user"
+  ],
+  "UT-AUTH-03": [
+    "tests/unit/test_utils.py::test_admin_required_redirects_regular_user"
+  ],
+  "UT-AUTH-04": [
+    "tests/unit/test_utils.py::test_admin_required_calls_wrapped_function_for_admin"
+  ],
+  "UT-CART-01": [
+    "tests/unit/test_cart_routes.py::test_add_to_cart_creates_new_cart_entry"
+  ],
+  "UT-CART-02": [
+    "tests/unit/test_cart_routes.py::test_add_to_cart_rejects_insufficient_stock"
+  ],
+  "UT-CART-03": [
+    "tests/unit/test_cart_routes.py::test_add_to_cart_rejects_inactive_product"
+  ],
+  "UT-CART-04": [
+    "tests/unit/test_cart_routes.py::test_update_cart_removes_item_when_quantity_zero"
+  ],
+  "UT-CHK-01": [
+    "tests/unit/test_checkout_routes.py::test_checkout_page_requires_login"
+  ],
+  "UT-CHK-02": [
+    "tests/unit/test_checkout_routes.py::test_checkout_page_redirects_when_cart_empty"
+  ],
+  "UT-CHK-03": [
+    "tests/unit/test_checkout_routes.py::test_checkout_creates_order_and_clears_cart"
+  ],
+  "UT-CHK-04": [
+    "tests/unit/test_checkout_routes.py::test_checkout_shows_error_when_order_creation_fails"
+  ],
+  "UT-CHK-05": [
+    "tests/unit/test_checkout_routes.py::test_checkout_success_page_shows_order"
+  ],
+  "UT-ORD-01": [
+    "tests/unit/test_order_status.py::TestOrderUpdateStatus::test_valid_transition_pending_to_processing"
+  ],
+  "UT-ORD-02": [
+    "tests/unit/test_order_status.py::TestOrderUpdateStatus::test_invalid_transition_delivered_to_pending"
+  ],
+  "IT-AUTH-01": [
+    "tests/integration/test_it_cases.py::test_it_auth_create_user"
+  ],
+  "IT-AUTH-02": [
+    "tests/integration/test_it_cases.py::test_it_auth_login_valid"
+  ],
+  "IT-AUTH-03": [
+    "tests/integration/test_it_cases.py::test_it_auth_locked_rejected"
+  ],
+  "IT-PROD-01": [
+    "tests/integration/test_it_cases.py::test_it_prod_filter_active"
+  ],
+  "IT-CART-01": [
+    "tests/integration/test_it_cases.py::test_it_cart_add"
+  ],
+  "IT-ORD-01": [
+    "tests/integration/test_it_cases.py::test_it_ord_create_success"
+  ],
+  "IT-ORD-02": [
+    "tests/integration/test_it_cases.py::test_it_ord_rollback_on_error"
+  ],
+  "IT-ORD-03": [
+    "tests/integration/test_it_cases.py::test_it_ord_cancel_restock"
+  ],
+  "IT-ADM-01": [
+    "tests/integration/test_it_cases.py::test_it_adm_forbidden_for_user"
+  ],
+  "IT-INV-01": [
+    "tests/integration/test_it_cases.py::test_it_inv_import"
+  ],
+  "ST-01": [
+    "tests/system/test_st_cases.py::test_st01_purchase_success"
+  ],
+  "ST-02": [
+    "tests/system/test_st_cases.py::test_st02_out_of_stock"
+  ],
+  "ST-03": [
+    "tests/system/test_st_cases.py::test_st03_order_state_machine"
+  ],
+  "ST-04": [
+    "tests/system/test_st_cases.py::test_st04_cancel_restock"
+  ],
+  "ST-05": [
+    "tests/system/test_st_cases.py::test_st05_inventory_import"
+  ],
+  "ST-06": [
+    "tests/system/test_st_cases.py::test_st06_user_forbidden_admin"
+  ],
+  "ST-07": [
+    "tests/system/test_st_cases.py::test_st07_view_own_orders"
+  ],
+  "ST-08": [
+    "tests/system/test_st_cases.py::test_st08_no_access_other_orders"
+  ],
+  "UT-AUTH-05": [
+    "tests/unit/test_auth_routes.py::TestAuthRoutes::test_register_rejects_short_password"
+  ],
+  "UT-AUTH-06": [
+    "tests/unit/test_auth_routes.py::TestAuthRoutes::test_register_rejects_mismatched_passwords"
+  ],
+  "UT-AUTH-07": [
+    "tests/unit/test_auth_routes.py::TestAuthRoutes::test_login_rejects_unknown_email"
+  ],
+  "UT-AUTH-08": [
+    "tests/unit/test_auth_routes.py::TestAuthRoutes::test_logout_clears_session"
+  ]
+}

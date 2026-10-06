@@ -1,0 +1,112 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-box-seam-fill me-2"></i>Quản Lý Kho</h2>
+    <a href="{{ url_for('admin.import_stock') }}" class="btn btn-gradient">
+        <i class="bi bi-box-arrow-in-down me-1"></i> Nhập kho mới
+    </a>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+        <div class="stat-card stat-primary">
+            <div class="stat-icon" style="background:rgba(99,102,241,0.1);color:var(--primary);">
+                <i class="bi bi-boxes"></i>
+            </div>
+            <div class="stat-value">{{ total_stock }}</div>
+            <div class="stat-label">Tổng tồn kho</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card stat-warning">
+            <div class="stat-icon" style="background:rgba(245,158,11,0.1);color:var(--warning);">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div class="stat-value">{{ low_stock_products | length }}</div>
+            <div class="stat-label">Sắp hết hàng (&le;5)</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card stat-success">
+            <div class="stat-icon" style="background:rgba(16,185,129,0.1);color:var(--success);">
+                <i class="bi bi-laptop"></i>
+            </div>
+            <div class="stat-value">{{ stock_summary | length }}</div>
+            <div class="stat-label">Số mặt hàng</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card stat-info">
+            <div class="stat-icon" style="background:rgba(6,182,212,0.1);color:var(--info);">
+                <i class="bi bi-building"></i>
+            </div>
+            <div class="stat-value">{{ supplier_count }}</div>
+            <div class="stat-label">Nhà cung cấp</div>
+        </div>
+    </div>
+</div>
+
+<!-- Low Stock Alert -->
+{% if low_stock_products %}
+    <div class="low-stock-alert mb-4">
+        <h6 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Cảnh báo sắp hết hàng</h6>
+        <div class="d-flex flex-wrap gap-2">
+            {% for p in low_stock_products %}
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-3 py-2">
+                    {{ p.name }} — <strong>{{ p.stock }}</strong> sp
+                </span>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<!-- Stock Summary Table -->
+<div class="admin-table">
+    <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
+        <h5 class="fw-bold mb-0">Tồn kho theo sản phẩm</h5>
+        <a href="{{ url_for('admin.inventory_logs') }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-clock-history me-1"></i> Lịch sử nhập/xuất
+        </a>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Hãng</th>
+                <th class="text-center">Tồn kho</th>
+                <th class="text-end">Giá bán</th>
+                <th class="text-end">Giá trị tồn</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in stock_summary %}
+                <tr class="{% if item.stock <= 5 and item.is_active %}table-warning{% endif %}">
+                    <td class="fw-semibold">{{ item.name }}</td>
+                    <td><span class="badge bg-light text-dark border">{{ item.brand }}</span></td>
+                    <td class="text-center">
+                        {% if item.stock == 0 %}
+                            <span class="badge bg-danger">Hết hàng</span>
+                        {% elif item.stock <= 5 %}
+                            <span class="text-warning fw-bold"><i class="bi bi-exclamation-circle me-1"></i>{{ item.stock }}</span>
+                        {% else %}
+                            <span class="fw-bold text-success">{{ item.stock }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end">{{ item.price | format_price }}</td>
+                    <td class="text-end fw-bold">{{ (item.price|int * item.stock|int) | format_price }}</td>
+                    <td>
+                        {% if item.is_active %}
+                            <span class="badge bg-success">Đang bán</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Ẩn</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

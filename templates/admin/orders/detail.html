@@ -1,0 +1,94 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+{% set st = order.status | order_status %}
+<div class="page-header">
+    <h2><i class="bi bi-receipt me-2"></i>Đơn Hàng #{{ order.id }}</h2>
+    <a href="{{ url_for('admin.orders') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại
+    </a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- Thông tin giao hàng -->
+        <div class="bg-white rounded-3 p-4 shadow-sm mb-4">
+            <h5 class="fw-bold mb-3">Thông tin giao hàng</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Người nhận:</strong> {{ order.receiver_name }}</p>
+                    <p class="mb-1"><strong>SĐT:</strong> {{ order.receiver_phone }}</p>
+                    <p class="mb-1"><strong>Địa chỉ:</strong> {{ order.receiver_address }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Khách hàng:</strong> {{ order.user_fullname }} ({{ order.user_email }})</p>
+                    <p class="mb-1"><strong>Thanh toán:</strong> {{ order.payment_method | payment_label }}</p>
+                    <p class="mb-1"><strong>Ngày đặt:</strong> {{ order.created_at }}</p>
+                    {% if order.note %}
+                        <p class="mb-1"><strong>Ghi chú:</strong> <em>{{ order.note }}</em></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Chi tiết sản phẩm -->
+        <div class="admin-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th class="text-center">SL</th>
+                        <th class="text-end">Đơn giá</th>
+                        <th class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order_details %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if item.image %}
+                                        <img src="{{ url_for('static', filename='images/laptops/' + item.image) }}" class="product-thumb" alt="">
+                                    {% endif %}
+                                    <span class="fw-semibold">{{ item.product_name }}</span>
+                                </div>
+                            </td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-end">{{ item.price | format_price }}</td>
+                            <td class="text-end fw-bold">{{ (item.price|int * item.quantity|int) | format_price }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold fs-5">Tổng cộng:</td>
+                        <td class="text-end fw-bold text-danger fs-5">{{ order.total_amount | format_price }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Cập nhật trạng thái -->
+    <div class="col-lg-4">
+        <div class="bg-white rounded-3 p-4 shadow-sm">
+            <h5 class="fw-bold mb-3"><i class="bi bi-arrow-repeat text-primary me-2"></i>Cập nhật trạng thái</h5>
+            <p class="mb-2">Trạng thái hiện tại: <span class="badge {{ st[1] }} fs-6">{{ st[0] }}</span></p>
+
+            <form action="{{ url_for('admin.update_order_status') }}" method="POST">
+                <input type="hidden" name="order_id" value="{{ order.id }}">
+                <select name="status" class="form-select mb-3">
+                    <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Chờ xử lý</option>
+                    <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Đang xử lý</option>
+                    <option value="shipping" {% if order.status == 'shipping' %}selected{% endif %}>Đang giao</option>
+                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Đã giao</option>
+                    <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Hủy đơn</option>
+                </select>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-check-circle me-1"></i> Cập nhật
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
